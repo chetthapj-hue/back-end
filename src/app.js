@@ -8,6 +8,7 @@ import { limiter } from "./middlewares/rateLimiter.js";
 export const app = express();
 
 // Globla middleware
+app.set("trust proxy", 1)
 app.use(helmet());
 
 const corsOptions = {
@@ -15,14 +16,13 @@ const corsOptions = {
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
-    "https://fount-end-git-main-chettha-pjs-projects.vercel.app",
+    "https://jsd-react-assessment-solution-gilt.vercel.app",
   ],
   credentials: true, // ✅ allow cookies to be sent
 };
 
 app.use(cors(corsOptions));
 
-app.set("trust proxy", 1)
 
 app.use(limiter);
 
