@@ -1,0 +1,60 @@
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import { router as apiRouters } from "./routes/index.js";
+import { limiter } from "./middlewares/rateLimiter.js";
+
+export const app = express();
+
+// Globla middleware
+app.use(helmet());
+
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "https://react-assessment-solution-for-expre.vercel.app",
+  ],
+  credentials: true, // ✅ allow cookies to be sent
+};
+
+app.use(cors(corsOptions));
+
+app.set("trust proxxy", 1)
+
+app.use(limiter);
+
+app.use(express.json());
+
+// Middleware to parse cookies (required for cookie-based auth)
+app.use(cookieParser());
+
+app.get("/", (req, res) => {
+  res.send("hello world");
+});
+
+app.use("/api", apiRouters);
+
+// Catch-all for 404 Not Found
+app.use((req, res, next) => {
+  const error = new Error(`Not found: ${req.method} ${req.originalUrl}`);
+  console.log(error);
+  error.name = error.name || "NotFoundError";
+  error.status = error.status || 404;
+  next(error);
+});
+
+// Centralized Error Handling Middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+    path: req.originalUrl,
+    method: req.method,
+    timestamp: new Date().toISOString(),
+    stack: err.stack,
+  });
+});
