@@ -124,7 +124,7 @@ router.post("/auth/cookie/login", async (req, res, next) => {
 router.post("/auth/cookie/logout", (req, res) => {
   const isProd = process.env.NODE_ENV === "production";
 
-  res.clearCookie("accessdToken", {
+  res.clearCookie("accessToken", {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? "none" : "lax",
